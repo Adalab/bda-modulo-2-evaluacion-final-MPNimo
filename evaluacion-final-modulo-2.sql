@@ -4,7 +4,7 @@
 
 -- EJERCICIOS --
 
-USE sakila;
+USE sakila; -- Base de datos que vamos a utilizar. 
 
 /*
 1. Selecciona todos los nombres de las películas sin que aparezcan duplicados.
@@ -82,11 +82,15 @@ SELECT first_name, last_name
 FROM actor
 WHERE actor_id BETWEEN 10 AND 20;
 
+
 /*
 8. Encuentra el título de las películas en la tabla film que no sean ni "R" ni "PG-13" en cuanto a su
 clasificación.
 */
 
+SELECT title, rating
+FROM film
+WHERE rating != 'R' AND rating != 'PG-13';
 
 
 /*
@@ -94,10 +98,25 @@ clasificación.
 junto con el recuento.
 */
 
+SELECT rating, COUNT(title) AS recuento
+FROM film
+GROUP BY rating;
+
+
 /*
 10. Encuentra la cantidad total de películas alquiladas por cada cliente y muestra el ID del cliente, su
 nombre y apellido junto con la cantidad de películas alquiladas.
 */
+
+SELECT 					-- Seleccionamos las columnas que se nos pide
+	c.customer_id, 
+    c.first_name, 
+    c.last_name, 
+    COUNT(r.customer_id) AS number_film_rental
+FROM customer AS c		-- De la tabla customer (donde se encuentra los datos de los clientes)
+INNER JOIN rental AS r USING (customer_id) -- Utilizamos un INNER JOIN para cruzar la tabla CUSTOMER junto con RENTAL devolviéndonos todas las filas en la que coinciden valores de ambas tablas.
+GROUP BY c.customer_id;
+
 
 /*
 11. Encuentra la cantidad total de películas alquiladas por categoría y muestra el nombre de la categoría
