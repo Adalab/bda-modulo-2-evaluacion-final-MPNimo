@@ -198,19 +198,91 @@ WHERE rating = 'R' AND length > 120;
 /*
  18. Muestra el nombre y apellido de los actores que aparecen en más de 10 películas.
  */
+ 
+ SELECT 
+	act.first_name, 
+    act.last_name, 
+    COUNT(f.film_id) AS numbers_films
+ FROM actor AS act
+ INNER JOIN film_actor AS fact USING (actor_id) 
+ INNER JOIN film AS f USING (film_id)
+ GROUP BY act.first_name, act.last_name
+ HAVING numbers_films > 10;
+ 
+ 
  /*
- 19. Hay algún actor o actriz que no apareca en ninguna película en la tabla film_actor.
+ 19. Hay algún actor o actriz que no aparezca en ninguna película en la tabla film_actor.
  */
+ 
+ -- OPCIÓN 1 DE RESPUESTA: 
+ -- No hace falta escribir ninguna consulta ya que la respuesta sería NO, debido a que, 
+ -- si entendemos que lo tenemos que responder SOLO con la tabla film_actor
+ -- en esa tabla nunca va a aparecer un actor_id sin film_id; al igual que 
+ -- no va a aparecer ningún film_id sin actor_id. Por lo tanto, no va a aparecer un 
+ -- actor_id sin film_id. 
+ 
+ 
+ -- OPCIÓN 2 DE RESPUESTA:
+ -- Si entendemos que necesitamos la tabla film_actor como una tabla que nos
+ -- da la información del cruce de actores con peliculas pero que para 
+ -- responder a la pregunta necesitamos como tabla principal la de actor, 
+ -- enotnces: 
+ 
+ -- OPCIÓN 2.1: Con un RIGHT JOIN
+ 
+ SELECT 
+	act.actor_id, 
+    act.first_name, 
+    act.last_name, 
+    COUNT(fact.film_id) AS numbers_films
+ FROM film_actor AS fact
+ RIGHT JOIN actor AS act USING (actor_id)
+ GROUP BY act.actor_id
+ HAVING numbers_films = 0;
+
+
+-- OPCIÓN 2.2: Con un LEFT JOIN
+
+ SELECT 
+	act.actor_id, 
+    act.first_name, 
+    act.last_name, 
+    COUNT(fact.film_id) AS numbers_films
+ FROM actor AS act
+ LEFT JOIN film_actor AS fact USING (actor_id)
+ GROUP BY act.actor_id
+ HAVING numbers_films = 0;
+ 
  
  /*
  20. Encuentra las categorías de películas que tienen un promedio de duración superior a 120 minutos y
  muestra el nombre de la categoría junto con el promedio de duración.
  */
  
+ SELECT 
+	catg.name, 
+    AVG(f.length) AS avg_length
+ FROM category AS catg
+ INNER JOIN film_category AS fcatg USING (category_id)
+ INNER JOIN film AS f USING (film_id)
+ GROUP BY catg.name
+ HAVING avg_length > 120;
+ 
+ 
  /*
  21. Encuentra los actores que han actuado en al menos 5 películas y muestra el nombre del actor junto con
  la cantidad de películas en las que han actuado.
  */
+ 
+ SELECT 
+	act.first_name, 
+    act.last_name, 
+    COUNT(act.actor_id) AS count_film
+ FROM actor AS act
+ INNER JOIN film_actor AS fact USING (actor_id)
+ INNER JOIN film AS f USING (film_id)
+ GROUP BY act.first_name, act.last_name
+ HAVING count_film >= 5;
  
  /*
  22. Encuentra el título de todas las películas que fueron alquiladas por más de 5 días. Utiliza una
