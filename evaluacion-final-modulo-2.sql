@@ -289,19 +289,56 @@ WHERE rating = 'R' AND length > 120;
  subconsulta para encontrar los rental_ids con una duración superior a 5 días y luego selecciona las
  películas correspondientes.
  */
+ 
+ SELECT DISTINCT f.title -- Se pone un DISTINCT porque si no se pusiera saldría repetido las películas, ya que puede haver varios rental_id de una misma película. 
+ FROM film AS f
+ INNER JOIN inventory AS i USING (film_id)
+ INNER JOIN rental AS r USING (inventory_id)
+ WHERE r.rental_id IN (
+		  SELECT r.rental_id  -- rental_id con una duración superior a 5 días. 
+		  FROM rental AS r
+		  INNER JOIN inventory AS i USING (inventory_id)
+		  INNER JOIN film AS f USING (film_id)
+		  WHERE f.rental_duration > 5
+		) ;
+  
   
  /*
  23. Encuentra el nombre y apellido de los actores que no han actuado en ninguna película de la categoría
  "Horror". Utiliza una subconsulta para encontrar los actores que han actuado en películas de la
  categoría "Horror" y luego exclúyelos de la lista de actores.
  */
+
+ SELECT 
+    first_name, 
+    last_name 
+ FROM actor
+ WHERE actor_id NOT IN ( 
+							SELECT DISTINCT -- Para quitar posibles actores duplicados que han actuado en peliculas de la categoría 'Horror'.
+								act.actor_id -- Se hace por el id del actor en lugar de por nombre y apellido, debido a que se ha detectado 2 actrices que tienen mismo nombre y apellido pero son 2 personas distintas ya que tiene id diferentes. 
+							 FROM actor AS act
+							 INNER JOIN film_actor AS fact USING (actor_id)
+							 INNER JOIN film AS f USING (film_id)
+							 INNER JOIN film_category AS fcatg USING (film_id)
+							 INNER JOIN category AS catg USING (category_id)
+							 WHERE catg.name = 'Horror'
+                             );
+ 
  
  /*
  24. Encuentra el título de las películas que son comedias y tienen una duración mayor a 180 minutos en la
  tabla film.
  */
  
+ SELECT f.title
+ FROM film AS f
+ INNER JOIN film_category AS fcatg USING (film_id)
+ INNER JOIN category AS catg USING (category_id)
+ WHERE f.length > 180 AND catg.name = 'Comedy';
+
+ 
  /*
  25. Encuentra todos los actores que han actuado juntos en al menos una película. La consulta debe mostrar
  el nombre y apellido de los actores y el número de películas en las que han actuado juntos.
 */
+
