@@ -342,3 +342,16 @@ WHERE rating = 'R' AND length > 120;
  el nombre y apellido de los actores y el número de películas en las que han actuado juntos.
 */
 
+-- Estamos haciendi un SELF JOIN, es decir, estamos combinando una tabla consigo misma, en este caso la tabla ACTOR consigo misma.
+--  Pero también necesitamos hacer una LEFT JOIN para traer de la tabla FILM_ACTOR los datos a ambas tablas ACTOR. 
+
+SELECT
+	CONCAT(act1.first_name, ' ', act1.last_name) AS complete_name_actor1, -- Nombre actor 1. Concatenamos para tener solo una col con el nombre completo del actor 1.
+    CONCAT(act2.first_name, ' ', act2.last_name) AS complete_name_actor2, -- Nombre actor 2. Concatenamos para tener solo una col con el nombre completo del actor 2.
+    COUNT(fact.film_id) AS numbers_films_actors -- Contamos los id de las peliculas. 
+FROM
+	actor AS act1, 
+    actor AS act2
+LEFT JOIN film_actor AS fact USING (actor_id)
+WHERE act1.actor_id <> act2.actor_id -- Indicamos que los id de las parejas de actores sean diferentes. Esto es para que no haga parejas de actores entre los mismos actores. Ejemplo: no cuente el número de peliculas de Adam Grant con él mismo. 
+GROUP BY act1.first_name, act1.last_name, act2.first_name, act2.last_name; -- Agrupamos por los nombres y apellidos de los dos actores. De esta manera contamos el número de películas que tienen por parejas. 
